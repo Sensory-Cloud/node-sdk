@@ -38,35 +38,25 @@ throw_not_implemented_error() {
 
 generate_proto_files() {
   echo "Generating proto files"
+  npm install -g grpc-tools
   npm install grpc_tools_node_protoc_ts --save-dev
 
   cd proto/
 
+  PROTOC_GEN_TS_PATH="../node_modules/.bin/protoc-gen-ts"
+
   for x in $(find . -iname "*.proto");
   do
     grpc_tools_node_protoc \
-      --js_out=import_style=commonjs,binary:../src/generated \
-      --grpc_out=grpc_js:../src/generated \
-      --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` \
-      -I ./proto \
-      $x;
-
-    protoc \
-      --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts \
+      --plugin=protoc-gen-ts=${PROTOC_GEN_TS_PATH} \
       --ts_out=grpc_js:../src/generated \
-      -I ./proto \
-      $x;
+      --js_out=import_style=commonjs:../src/generated \
+      --grpc_out=grpc_js:../src/generated \
+      $x
 
       echo "Generated grpc code for $x";
   done
   cd ..
-
-  for x in $(find ./src/generated -iname "*.?s");
-  do
-    sed -i '' "s ../../../validate/validate_pb ../validate/validate_pb g" $x
-    sed -i '' "s ../../../common/common_pb ../common/common_pb g" $x
-    sed -i '' "s ../../../../v1/management ./ g" $x
-  done
 }
 
 build() {
