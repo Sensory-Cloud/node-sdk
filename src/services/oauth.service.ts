@@ -1,18 +1,21 @@
-import { Config } from "../config";
-import { TokenRequest } from "../generated/oauth/oauth_pb";
-import { OauthServiceClient } from "../generated/oauth/oauth_grpc_pb";
-import { CryptoService } from "./crypto.service";
-import { DeviceResponse, DeviceGetWhoAmIRequest, EnrollDeviceRequest, RenewDeviceCredentialRequest } from "../generated/v1/management/device_pb";
+import { Config } from '../config';
+import { TokenRequest } from '../generated/oauth/oauth_pb';
+import { OauthServiceClient } from '../generated/oauth/oauth_grpc_pb';
+import { CryptoService } from './crypto.service';
+import {
+  DeviceResponse,
+  DeviceGetWhoAmIRequest,
+  EnrollDeviceRequest,
+  RenewDeviceCredentialRequest,
+} from '../generated/v1/management/device_pb';
 
 import { v4 } from 'uuid';
-import { DeviceServiceClient } from "../generated/v1/management/device_grpc_pb";
-import { GenericClient } from "../generated/common/common_pb";
-import * as grpc from "@grpc/grpc-js";
-import { ITokenManager } from "../token-manager/token.manager";
+import { DeviceServiceClient } from '../generated/v1/management/device_grpc_pb';
+import { GenericClient } from '../generated/common/common_pb';
+import * as grpc from '@grpc/grpc-js';
 
 /** Manages OAuth interactions with Sensory Cloud */
 export interface IOauthService {
-
   /**
    * @returns the underlying credential store used by the service
    */
@@ -38,7 +41,10 @@ export interface IOauthService {
    * @param  {string} credential - The credential configured on the Sensory Cloud server
    * @returns Promise
    */
-  register(deviceName: string, credential: string): Promise<DeviceResponse.AsObject>;
+  register(
+    deviceName: string,
+    credential: string
+  ): Promise<DeviceResponse.AsObject>;
 
   /**
    * Renews the credentials stored in the attached SecureCredentialStore. This should be called once the device key has expired.
@@ -51,31 +57,30 @@ export interface IOauthService {
 
 /** Holds OAuth token and expiration */
 export type OauthToken = {
-  token: string
-  expires: Date
-}
+  token: string;
+  expires: Date;
+};
 
 /** Holds OAuth clientId and secret */
 export type OauthClient = {
   clientId: string;
   clientSecret: string;
-}
+};
 
 /** Securely serves credentials */
 export interface ISecureCredentialStore {
-  saveCredentials(clientId: string, clientSecret: string): void
-  getClientId(): Promise<string>
-  getClientSecret(): Promise<string>
+  saveCredentials(clientId: string, clientSecret: string): void;
+  getClientId(): Promise<string>;
+  getClientSecret(): Promise<string>;
 }
 
 /** Service to manage all OAuth-related functions */
 export class OauthService implements IOauthService {
-
   constructor(
     private readonly credentialStore: ISecureCredentialStore,
-    private readonly tokenManager: ITokenManager,
     private oauthClient: OauthServiceClient | undefined = undefined,
-    private deviceClient: DeviceServiceClient | undefined = undefined) { }
+    private deviceClient: DeviceServiceClient | undefined = undefined
+  ) {}
 
   /**
    * @returns the underlying credential store used by the service
@@ -93,8 +98,8 @@ export class OauthService implements IOauthService {
   public generateCredentials(): OauthClient {
     return {
       clientId: v4(),
-      clientSecret: CryptoService.getSecureRandomString(26)
-    }
+      clientSecret: CryptoService.getSecureRandomString(26),
+    };
   }
 
   /**
@@ -107,7 +112,7 @@ export class OauthService implements IOauthService {
     const meta = new grpc.Metadata();
     const token = await this.getToken();
 
-    meta.set("Authorization", `Bearer ${token.token}`);
+    meta.set('Authorization', `Bearer ${token.token}`);
 
     return new Promise<DeviceResponse.AsObject>((resolve, reject) => {
       const request = new DeviceGetWhoAmIRequest();
@@ -148,8 +153,8 @@ export class OauthService implements IOauthService {
           return reject(err || Error('No response returned'));
         }
         const token = res.getAccesstoken();
-        const expires = new Date(now.getTime() + res.getExpiresin() * 1000)
-        return resolve({token, expires})
+        const expires = new Date(now.getTime() + res.getExpiresin() * 1000);
+        return resolve({ token, expires });
       });
     });
   }
@@ -162,7 +167,10 @@ export class OauthService implements IOauthService {
    * @param  {string} credential - The credential configured on the Sensory Cloud server
    * @returns Promise
    */
-  public async register(deviceName: string, credential: string): Promise<DeviceResponse.AsObject> {
+  public async register(
+    deviceName: string,
+    credential: string
+  ): Promise<DeviceResponse.AsObject> {
     const config = Config.getSharedConfig();
     const clientId = await this.credentialStore.getClientId();
     if (!clientId) {
@@ -176,20 +184,20 @@ export class OauthService implements IOauthService {
 
     const deviceId = config.deviceId;
 
-    const request = new EnrollDeviceRequest()
+    const request = new EnrollDeviceRequest();
     request.setDeviceid(deviceId);
     request.setName(deviceName);
 
     request.setCredential(credential);
     request.setTenantid(config.tenantId);
 
-    const client = new GenericClient()
+    const client = new GenericClient();
     client.setClientid(clientId);
     client.setSecret(clientSecret);
 
     request.setClient(client);
 
-    return new Promise<DeviceResponse.AsObject>(async (resolve, reject) => {
+    return new Promise<DeviceResponse.AsObject>((resolve, reject) => {
       this.getDeviceClient().enrollDevice(request, (err, res) => {
         if (err || !res) {
           return reject(err || Error('No response returned'));
@@ -206,7 +214,9 @@ export class OauthService implements IOauthService {
    * @param credential - The credential configured on the Sensory Cloud server
    * @returns Promise
    */
-  public async renewDeviceCredential(credential: string): Promise<DeviceResponse.AsObject> {
+  public async renewDeviceCredential(
+    credential: string
+  ): Promise<DeviceResponse.AsObject> {
     const config = Config.getSharedConfig();
 
     const clientId = await this.credentialStore.getClientId();
@@ -220,7 +230,7 @@ export class OauthService implements IOauthService {
     request.setTenantid(config.tenantId);
     request.setCredential(credential);
 
-    return new Promise<DeviceResponse.AsObject>(async (resolve, reject) => {
+    return new Promise<DeviceResponse.AsObject>((resolve, reject) => {
       this.getDeviceClient().renewDeviceCredential(request, (err, res) => {
         if (err || !res) {
           return reject(err || Error('No response returned'));
@@ -233,15 +243,48 @@ export class OauthService implements IOauthService {
 
   private getOauthClient(): OauthServiceClient {
     if (this.oauthClient == undefined) {
-      this.oauthClient = new OauthServiceClient(Config.getHost(), this.tokenManager.getCallCredentials())
+      const credentials = Config.getSharedConfig().isSecure
+        ? grpc.credentials.createSsl()
+        : grpc.credentials.createInsecure();
+      this.oauthClient = new OauthServiceClient(Config.getHost(), credentials);
     }
     return this.oauthClient;
   }
 
   private getDeviceClient(): DeviceServiceClient {
     if (this.deviceClient == undefined) {
-      this.deviceClient = new DeviceServiceClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.deviceClient = new DeviceServiceClient(
+        Config.getHost(),
+        this.getCallCredentials()
+      );
     }
     return this.deviceClient;
+  }
+
+  public getCallCredentials(): grpc.ChannelCredentials {
+    const callCredentials = grpc.credentials.createFromMetadataGenerator(
+      async (_, cb) => {
+        try {
+          const metadata = new grpc.Metadata();
+          const token = await this.getToken();
+          metadata.set('Authorization', `Bearer ${token}`);
+          cb(null, metadata);
+        } catch (err) {
+          cb(err);
+        }
+      }
+    );
+
+    if (Config.getSharedConfig().isSecure) {
+      return grpc.credentials.combineChannelCredentials(
+        grpc.credentials.createSsl(),
+        callCredentials
+      );
+    } else {
+      return grpc.credentials.combineChannelCredentials(
+        grpc.credentials.createInsecure(),
+        callCredentials
+      );
+    }
   }
 }

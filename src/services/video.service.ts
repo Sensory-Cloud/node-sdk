@@ -1,20 +1,42 @@
-import * as grpc from "@grpc/grpc-js";
-import { EnrollmentIdentifier } from "..";
-import { Config } from "../config";
-import { CompressionConfiguration } from "../generated/common/common_pb";
-import { GetModelsResponse, RecognitionThreshold } from "../generated/v1/video/video_pb";
-import { AuthenticateConfig, AuthenticateRequest, AuthenticateResponse, CreateEnrollmentConfig, CreateEnrollmentRequest, CreateEnrollmentResponse, GetModelsRequest, LivenessRecognitionResponse, ValidateRecognitionConfig, ValidateRecognitionRequest } from "../generated/v1/video/video_pb";
-import { VideoBiometricsClient, VideoModelsClient, VideoRecognitionClient } from "../generated/v1/video/video_grpc_pb";
-import { ITokenManager } from "../token-manager/token.manager";
+import * as grpc from '@grpc/grpc-js';
+import { EnrollmentIdentifier } from '..';
+import { Config } from '../config';
+import { CompressionConfiguration } from '../generated/common/common_pb';
+import {
+  GetModelsResponse,
+  RecognitionThreshold,
+} from '../generated/v1/video/video_pb';
+import {
+  AuthenticateConfig,
+  AuthenticateRequest,
+  AuthenticateResponse,
+  CreateEnrollmentConfig,
+  CreateEnrollmentRequest,
+  CreateEnrollmentResponse,
+  GetModelsRequest,
+  LivenessRecognitionResponse,
+  ValidateRecognitionConfig,
+  ValidateRecognitionRequest,
+} from '../generated/v1/video/video_pb';
+import {
+  VideoBiometricsClient,
+  VideoModelsClient,
+  VideoRecognitionClient,
+} from '../generated/v1/video/video_grpc_pb';
+import { ITokenManager } from '../token-manager/token.manager';
 
 /** Handles all image and video requests to Sensory Cloud */
 export class VideoService {
-
   constructor(
     private readonly tokenManager: ITokenManager,
     private modelsClient: VideoModelsClient | undefined = undefined,
-    private biometricStreamingClient: VideoBiometricsClient | undefined = undefined,
-    private recognitionStreamingClient: VideoRecognitionClient | undefined = undefined) { }
+    private biometricStreamingClient:
+      | VideoBiometricsClient
+      | undefined = undefined,
+    private recognitionStreamingClient:
+      | VideoRecognitionClient
+      | undefined = undefined
+  ) {}
 
   /**
    * Fetch all video the models supported by your instance of Sensory Cloud.
@@ -50,10 +72,12 @@ export class VideoService {
     modelName: string,
     isLivenessEnabled: boolean,
     threshold: RecognitionThreshold = RecognitionThreshold.HIGH,
-    numLiveFramesRequired: number = 0,
+    numLiveFramesRequired = 0,
     referenceId?: string,
-    disableServerEnrollmentStorage?: boolean): Promise<grpc.ClientDuplexStream<CreateEnrollmentRequest, CreateEnrollmentResponse>> {
-
+    disableServerEnrollmentStorage?: boolean
+  ): Promise<
+    grpc.ClientDuplexStream<CreateEnrollmentRequest, CreateEnrollmentResponse>
+  > {
     const sdkConfig = Config.getSharedConfig();
     const enrollmentStream = this.getBioStreamingClient().createEnrollment();
 
@@ -75,7 +99,9 @@ export class VideoService {
     }
 
     if (disableServerEnrollmentStorage != undefined) {
-      config.setDisableserverenrollmenttemplatestorage(disableServerEnrollmentStorage);
+      config.setDisableserverenrollmenttemplatestorage(
+        disableServerEnrollmentStorage
+      );
     }
 
     request.setConfig(config);
@@ -97,7 +123,10 @@ export class VideoService {
     enrollment: EnrollmentIdentifier,
     isLivenessEnabled: boolean,
     threshold: RecognitionThreshold = RecognitionThreshold.HIGH,
-    enrollmentToken?: Uint8Array): Promise<grpc.ClientDuplexStream<AuthenticateRequest, AuthenticateResponse>> {
+    enrollmentToken?: Uint8Array
+  ): Promise<
+    grpc.ClientDuplexStream<AuthenticateRequest, AuthenticateResponse>
+  > {
     const authenticateStream = this.getBioStreamingClient().authenticate();
 
     const request = new AuthenticateRequest();
@@ -105,9 +134,9 @@ export class VideoService {
     const compressionConfig = new CompressionConfiguration();
 
     if (enrollment.enrollmentId) {
-      config.setEnrollmentid(enrollment.enrollmentId)
+      config.setEnrollmentid(enrollment.enrollmentId);
     } else if (enrollment.enrollmentGroupId) {
-      config.setEnrollmentgroupid(enrollment.enrollmentGroupId)
+      config.setEnrollmentgroupid(enrollment.enrollmentGroupId);
     }
 
     config.setIslivenessenabled(isLivenessEnabled);
@@ -133,15 +162,21 @@ export class VideoService {
   public async streamLivenessRecognition(
     userId: string,
     modelName: string,
-    threshold: RecognitionThreshold = RecognitionThreshold.HIGH): Promise<grpc.ClientDuplexStream<ValidateRecognitionRequest, LivenessRecognitionResponse>> {
+    threshold: RecognitionThreshold = RecognitionThreshold.HIGH
+  ): Promise<
+    grpc.ClientDuplexStream<
+      ValidateRecognitionRequest,
+      LivenessRecognitionResponse
+    >
+  > {
     const recognitionStream = this.getRecogStreamingClient().validateLiveness();
 
     const request = new ValidateRecognitionRequest();
     const config = new ValidateRecognitionConfig();
 
-    config.setUserid(userId)
-    config.setModelname(modelName)
-    config.setThreshold(threshold)
+    config.setUserid(userId);
+    config.setModelname(modelName);
+    config.setThreshold(threshold);
     request.setConfig(config);
 
     recognitionStream.write(request);
@@ -151,21 +186,30 @@ export class VideoService {
 
   private getModelsClient(): VideoModelsClient {
     if (this.modelsClient == undefined) {
-      this.modelsClient = new VideoModelsClient(Config.getHost(), this.tokenManager.getCallCredentials())
+      this.modelsClient = new VideoModelsClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.modelsClient;
   }
 
   private getBioStreamingClient(): VideoBiometricsClient {
     if (this.biometricStreamingClient == undefined) {
-      this.biometricStreamingClient = new VideoBiometricsClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.biometricStreamingClient = new VideoBiometricsClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.biometricStreamingClient;
   }
 
   private getRecogStreamingClient(): VideoRecognitionClient {
     if (this.recognitionStreamingClient == undefined) {
-      this.recognitionStreamingClient = new VideoRecognitionClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.recognitionStreamingClient = new VideoRecognitionClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.recognitionStreamingClient;
   }

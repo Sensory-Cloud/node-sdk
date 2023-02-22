@@ -1,15 +1,15 @@
-import { Config } from "../config";
-import { ServerHealthResponse } from "../generated/common/common_pb";
-import { HealthRequest } from "../generated/health/health_pb";
-import { HealthServiceClient } from "../generated/health/health_grpc_pb";
-import { ITokenManager } from "../token-manager/token.manager";
+import { Config } from '../config';
+import { ServerHealthResponse } from '../generated/common/common_pb';
+import { HealthRequest } from '../generated/health/health_pb';
+import { HealthServiceClient } from '../generated/health/health_grpc_pb';
+import { ITokenManager } from '../token-manager/token.manager';
 
 /** Service to handle all server health functions */
 export class HealthService {
   constructor(
     private healthClient: HealthServiceClient | undefined = undefined,
-    private readonly tokenManager: ITokenManager) {
-  }
+    private readonly tokenManager: ITokenManager
+  ) {}
 
   /**
    * Get the health status of the cloud endpoint defined in Config
@@ -28,7 +28,10 @@ export class HealthService {
 
   private getHealthClient(): HealthServiceClient {
     if (this.healthClient == undefined) {
-      this.healthClient = new HealthServiceClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.healthClient = new HealthServiceClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.healthClient;
   }

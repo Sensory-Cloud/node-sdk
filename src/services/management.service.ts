@@ -1,23 +1,33 @@
-import { Config } from "../config";
-import { AppendEnrollmentGroupRequest, CreateEnrollmentGroupRequest, DeleteEnrollmentGroupRequest, DeleteEnrollmentRequest, EnrollmentGroupResponse, EnrollmentResponse, GetEnrollmentGroupsResponse, GetEnrollmentsRequest, GetEnrollmentsResponse } from "../generated/v1/management/enrollment_pb";
-import { EnrollmentServiceClient } from "../generated/v1/management/enrollment_grpc_pb";
-import { ITokenManager } from "../token-manager/token.manager";
-
-import * as grpc from "@grpc/grpc-js";
+import { Config } from '../config';
+import {
+  AppendEnrollmentGroupRequest,
+  CreateEnrollmentGroupRequest,
+  DeleteEnrollmentGroupRequest,
+  DeleteEnrollmentRequest,
+  EnrollmentGroupResponse,
+  EnrollmentResponse,
+  GetEnrollmentGroupsResponse,
+  GetEnrollmentsRequest,
+  GetEnrollmentsResponse,
+} from '../generated/v1/management/enrollment_pb';
+import { EnrollmentServiceClient } from '../generated/v1/management/enrollment_grpc_pb';
+import { ITokenManager } from '../token-manager/token.manager';
 
 /** Service to handle all typical CRUD functions */
 export class ManagementService {
   constructor(
     private readonly tokenManager: ITokenManager,
-    private enrollmentClient: EnrollmentServiceClient | undefined = undefined) {
-  }
+    private enrollmentClient: EnrollmentServiceClient | undefined = undefined
+  ) {}
 
   /**
    * Obtains all of the active enrollments given the userId
    * @param  {string} userId - the unique userId
    * @returns Promise<GetEnrollmentsResponse.AsObject> - a list of user enrollments
    */
-  public async getEnrollments(userId: string): Promise<GetEnrollmentsResponse.AsObject> {
+  public async getEnrollments(
+    userId: string
+  ): Promise<GetEnrollmentsResponse.AsObject> {
     return new Promise<GetEnrollmentsResponse.AsObject>((resolve, reject) => {
       const request = new GetEnrollmentsRequest();
       request.setUserid(userId);
@@ -36,18 +46,25 @@ export class ManagementService {
    * @param  {string} userId - the unique userId
    * @returns Promise<GetEnrollmentGroupsResponse.AsObject> - a list of enrollment groups
    */
-  public async getEnrollmentGroups(userId: string): Promise<GetEnrollmentGroupsResponse.AsObject> {
-    return new Promise<GetEnrollmentGroupsResponse.AsObject>((resolve, reject) => {
-      const request = new GetEnrollmentsRequest();
-      request.setUserid(userId);
+  public async getEnrollmentGroups(
+    userId: string
+  ): Promise<GetEnrollmentGroupsResponse.AsObject> {
+    return new Promise<GetEnrollmentGroupsResponse.AsObject>(
+      (resolve, reject) => {
+        const request = new GetEnrollmentsRequest();
+        request.setUserid(userId);
 
-      this.getEnrollmentClient().getEnrollmentGroups(request, async (err, res) => {
-        if (err || !res) {
-          return reject(err || Error('No response returned'));
-        }
-        return resolve(res.toObject());
-      });
-    });
+        this.getEnrollmentClient().getEnrollmentGroups(
+          request,
+          async (err, res) => {
+            if (err || !res) {
+              return reject(err || Error('No response returned'));
+            }
+            return resolve(res.toObject());
+          }
+        );
+      }
+    );
   }
 
   /**
@@ -60,7 +77,14 @@ export class ManagementService {
    * @param  {string[]} enrollmentIds - The enrollmentIds to be associated with this group. Max 10.
    * @returns Promise<EnrollmentGroupResponse.AsObject> - a summary of the enrollment group
    */
-  public async createEnrollmentGroup(userId: string, groupId: string, groupName: string, description: string, modelName: string, enrollmentIds: string[]): Promise<EnrollmentGroupResponse.AsObject> {
+  public async createEnrollmentGroup(
+    userId: string,
+    groupId: string,
+    groupName: string,
+    description: string,
+    modelName: string,
+    enrollmentIds: string[]
+  ): Promise<EnrollmentGroupResponse.AsObject> {
     return new Promise<EnrollmentGroupResponse.AsObject>((resolve, reject) => {
       const request = new CreateEnrollmentGroupRequest();
       request.setId(groupId);
@@ -70,12 +94,15 @@ export class ManagementService {
       request.setUserid(userId);
       request.setEnrollmentidsList(enrollmentIds);
 
-      this.getEnrollmentClient().createEnrollmentGroup(request, async (err, res) => {
-        if (err || !res) {
-          return reject(err || Error('No response returned'));
+      this.getEnrollmentClient().createEnrollmentGroup(
+        request,
+        async (err, res) => {
+          if (err || !res) {
+            return reject(err || Error('No response returned'));
+          }
+          return resolve(res.toObject());
         }
-        return resolve(res.toObject());
-      });
+      );
     });
   }
 
@@ -85,18 +112,24 @@ export class ManagementService {
    * @param  {string[]} enrollmentIds - The enrollmentIds to be associated with this group. Max 10.
    * @returns Promise<EnrollmentGroupResponse.AsObject> - a summary of the enrollment group
    */
-  public async appendEnrollmentGroup(groupId: string, enrollmentIds: string[]): Promise<EnrollmentGroupResponse.AsObject> {
+  public async appendEnrollmentGroup(
+    groupId: string,
+    enrollmentIds: string[]
+  ): Promise<EnrollmentGroupResponse.AsObject> {
     return new Promise<EnrollmentGroupResponse.AsObject>((resolve, reject) => {
       const request = new AppendEnrollmentGroupRequest();
       request.setGroupid(groupId);
       request.setEnrollmentidsList(enrollmentIds);
 
-      this.getEnrollmentClient().appendEnrollmentGroup(request, async (err, res) => {
-        if (err || !res) {
-          return reject(err || Error('No response returned'));
+      this.getEnrollmentClient().appendEnrollmentGroup(
+        request,
+        async (err, res) => {
+          if (err || !res) {
+            return reject(err || Error('No response returned'));
+          }
+          return resolve(res.toObject());
         }
-        return resolve(res.toObject());
-      });
+      );
     });
   }
 
@@ -105,7 +138,9 @@ export class ManagementService {
    * @param  {string} id - the unique enrollmentId
    * @returns Promise<EnrollmentResponse.AsObject> - a summary of the removed enrollment
    */
-  public async deleteEnrollment(id: string): Promise<EnrollmentResponse.AsObject> {
+  public async deleteEnrollment(
+    id: string
+  ): Promise<EnrollmentResponse.AsObject> {
     return new Promise<EnrollmentResponse.AsObject>((resolve, reject) => {
       const request = new DeleteEnrollmentRequest();
       request.setId(id);
@@ -124,7 +159,9 @@ export class ManagementService {
    * @param  {string} id - the unique enrollmentGroupId
    * @returns Promise<EnrollmentGroupResponse.AsObject> - a summary of the removed enrollment group
    */
-  public async deleteEnrollmentGroup(groupId: string): Promise<EnrollmentGroupResponse.AsObject> {
+  public async deleteEnrollmentGroup(
+    groupId: string
+  ): Promise<EnrollmentGroupResponse.AsObject> {
     return new Promise<EnrollmentGroupResponse.AsObject>((resolve, reject) => {
       const request = new DeleteEnrollmentGroupRequest();
       request.setId(groupId);
@@ -140,7 +177,10 @@ export class ManagementService {
 
   private getEnrollmentClient(): EnrollmentServiceClient {
     if (this.enrollmentClient == undefined) {
-      this.enrollmentClient = new EnrollmentServiceClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.enrollmentClient = new EnrollmentServiceClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.enrollmentClient;
   }

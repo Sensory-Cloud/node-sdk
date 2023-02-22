@@ -1,26 +1,57 @@
-import { Config } from "../config";
-import { AudioConfig, AuthenticateConfig, AuthenticateRequest, AuthenticateResponse, CreateEnrolledEventRequest,
-  CreateEnrollmentEventConfig, CreateEnrollmentConfig, CreateEnrollmentRequest, CreateEnrollmentResponse,
-  GetModelsRequest, GetModelsResponse, ThresholdSensitivity, TranscribeConfig, TranscribeRequest,
-  TranscribeResponse, ValidateEventConfig, ValidateEventRequest, ValidateEventResponse, ValidateEnrolledEventRequest,
-  ValidateEnrolledEventConfig, ValidateEnrolledEventResponse, SynthesizeSpeechResponse, SynthesizeSpeechRequest,
-  VoiceSynthesisConfig, TranscribeWord, TranscribeWordResponse, CustomVocabularyWords } from "../generated/v1/audio/audio_pb";
-import { AudioBiometricsClient, AudioEventsClient, AudioModelsClient, AudioSynthesisClient, AudioTranscriptionsClient } from "../generated/v1/audio/audio_grpc_pb";
-import { ITokenManager } from "../token-manager/token.manager";
-import * as grpc from "@grpc/grpc-js";
+import { Config } from '../config';
+import {
+  AudioConfig,
+  AuthenticateConfig,
+  AuthenticateRequest,
+  AuthenticateResponse,
+  CreateEnrolledEventRequest,
+  CreateEnrollmentEventConfig,
+  CreateEnrollmentConfig,
+  CreateEnrollmentRequest,
+  CreateEnrollmentResponse,
+  GetModelsRequest,
+  GetModelsResponse,
+  ThresholdSensitivity,
+  TranscribeConfig,
+  TranscribeRequest,
+  TranscribeResponse,
+  ValidateEventConfig,
+  ValidateEventRequest,
+  ValidateEventResponse,
+  ValidateEnrolledEventRequest,
+  ValidateEnrolledEventConfig,
+  ValidateEnrolledEventResponse,
+  SynthesizeSpeechResponse,
+  SynthesizeSpeechRequest,
+  VoiceSynthesisConfig,
+  TranscribeWord,
+  TranscribeWordResponse,
+  CustomVocabularyWords,
+} from '../generated/v1/audio/audio_pb';
+import {
+  AudioBiometricsClient,
+  AudioEventsClient,
+  AudioModelsClient,
+  AudioSynthesisClient,
+  AudioTranscriptionsClient,
+} from '../generated/v1/audio/audio_grpc_pb';
+import { ITokenManager } from '../token-manager/token.manager';
+import * as grpc from '@grpc/grpc-js';
 
-export type EnrollmentIdentifier = {enrollmentId: string, enrollmentGroupId?: never} | {enrollmentId?: never, enrollmentGroupId: string};
+export type EnrollmentIdentifier =
+  | { enrollmentId: string; enrollmentGroupId?: never }
+  | { enrollmentId?: never; enrollmentGroupId: string };
 
 /** Handles all audio requests to Sensory Cloud */
 export class AudioService {
-
   constructor(
     private readonly tokenManager: ITokenManager,
     private modelsClient: AudioModelsClient | undefined = undefined,
     private biometricsClient: AudioBiometricsClient | undefined = undefined,
     private eventClient: AudioEventsClient | undefined = undefined,
     private transcribeClient: AudioTranscriptionsClient | undefined = undefined,
-    private synthesisClient: AudioSynthesisClient | undefined = undefined) { }
+    private synthesisClient: AudioSynthesisClient | undefined = undefined
+  ) {}
 
   /**
    * Fetch all the audio models supported by your instance of Sensory Cloud.
@@ -59,8 +90,10 @@ export class AudioService {
     isLivenessEnabled: boolean,
     audioConfig: AudioConfig.AsObject,
     referenceId?: string,
-    disableServerEnrollmentStorage?: boolean): Promise<grpc.ClientDuplexStream<CreateEnrollmentRequest, CreateEnrollmentResponse>> {
-
+    disableServerEnrollmentStorage?: boolean
+  ): Promise<
+    grpc.ClientDuplexStream<CreateEnrollmentRequest, CreateEnrollmentResponse>
+  > {
     const sdkConfig = Config.getSharedConfig();
     const enrollmentStream = this.getBioClient().createEnrollment();
 
@@ -74,7 +107,9 @@ export class AudioService {
     config.setModelname(modelName);
     config.setIslivenessenabled(isLivenessEnabled);
     if (disableServerEnrollmentStorage != undefined) {
-      config.setDisableserverenrollmenttemplatestorage(disableServerEnrollmentStorage);
+      config.setDisableserverenrollmenttemplatestorage(
+        disableServerEnrollmentStorage
+      );
     }
 
     if (referenceId) {
@@ -84,9 +119,11 @@ export class AudioService {
     audio.setEncoding(audioConfig.encoding);
     audio.setSampleratehertz(audioConfig.sampleratehertz);
     audio.setAudiochannelcount(audioConfig.audiochannelcount);
-    audio.setLanguagecode(audioConfig.languagecode || Config.defaultLanguageCode);
+    audio.setLanguagecode(
+      audioConfig.languagecode || Config.defaultLanguageCode
+    );
 
-    config.setAudio(audio)
+    config.setAudio(audio);
     request.setConfig(config);
 
     // Send config
@@ -111,9 +148,13 @@ export class AudioService {
     enrollment: EnrollmentIdentifier,
     isLivenessEnabled: boolean,
     sensitivity: ThresholdSensitivity = ThresholdSensitivity.MEDIUM,
-    security: AuthenticateConfig.ThresholdSecurity = AuthenticateConfig.ThresholdSecurity.HIGH,
+    security: AuthenticateConfig.ThresholdSecurity = AuthenticateConfig
+      .ThresholdSecurity.HIGH,
     audioConfig: AudioConfig.AsObject,
-    enrollmentToken?: Uint8Array): Promise<grpc.ClientDuplexStream<AuthenticateRequest, AuthenticateResponse>> {
+    enrollmentToken?: Uint8Array
+  ): Promise<
+    grpc.ClientDuplexStream<AuthenticateRequest, AuthenticateResponse>
+  > {
     const authenticationStream = this.getBioClient().authenticate();
 
     const request = new AuthenticateRequest();
@@ -138,9 +179,11 @@ export class AudioService {
     audio.setEncoding(audioConfig.encoding);
     audio.setSampleratehertz(audioConfig.sampleratehertz);
     audio.setAudiochannelcount(audioConfig.audiochannelcount);
-    audio.setLanguagecode(audioConfig.languagecode || Config.defaultLanguageCode);
+    audio.setLanguagecode(
+      audioConfig.languagecode || Config.defaultLanguageCode
+    );
 
-    config.setAudio(audio)
+    config.setAudio(audio);
     request.setConfig(config);
 
     // Send config
@@ -162,7 +205,10 @@ export class AudioService {
     userId: string,
     modelName: string,
     sensitivity: ThresholdSensitivity = ThresholdSensitivity.MEDIUM,
-    audioConfig: AudioConfig.AsObject): Promise<grpc.ClientDuplexStream<ValidateEventRequest, ValidateEventResponse>> {
+    audioConfig: AudioConfig.AsObject
+  ): Promise<
+    grpc.ClientDuplexStream<ValidateEventRequest, ValidateEventResponse>
+  > {
     const eventStream = this.getEventClient().validateEvent();
 
     const request = new ValidateEventRequest();
@@ -175,7 +221,9 @@ export class AudioService {
     audio.setEncoding(audioConfig.encoding);
     audio.setSampleratehertz(audioConfig.sampleratehertz);
     audio.setAudiochannelcount(audioConfig.audiochannelcount);
-    audio.setLanguagecode(audioConfig.languagecode || Config.defaultLanguageCode);
+    audio.setLanguagecode(
+      audioConfig.languagecode || Config.defaultLanguageCode
+    );
 
     config.setAudio(audio);
     request.setConfig(config);
@@ -203,7 +251,13 @@ export class AudioService {
     userId: string,
     modelName: string,
     audioConfig: AudioConfig.AsObject,
-    referenceId?: string): Promise<grpc.ClientDuplexStream<CreateEnrolledEventRequest, CreateEnrollmentResponse>> {
+    referenceId?: string
+  ): Promise<
+    grpc.ClientDuplexStream<
+      CreateEnrolledEventRequest,
+      CreateEnrollmentResponse
+    >
+  > {
     const enrollmentStream = this.getEventClient().createEnrolledEvent();
 
     const request = new CreateEnrolledEventRequest();
@@ -221,9 +275,11 @@ export class AudioService {
     audio.setEncoding(audioConfig.encoding);
     audio.setSampleratehertz(audioConfig.sampleratehertz);
     audio.setAudiochannelcount(audioConfig.audiochannelcount);
-    audio.setLanguagecode(audioConfig.languagecode || Config.defaultLanguageCode);
+    audio.setLanguagecode(
+      audioConfig.languagecode || Config.defaultLanguageCode
+    );
 
-    config.setAudio(audio)
+    config.setAudio(audio);
     request.setConfig(config);
 
     // Send config
@@ -247,7 +303,13 @@ export class AudioService {
     enrollment: EnrollmentIdentifier,
     sensitivity: ThresholdSensitivity = ThresholdSensitivity.MEDIUM,
     audioConfig: AudioConfig.AsObject,
-    enrollmentToken?: Uint8Array): Promise<grpc.ClientDuplexStream<ValidateEnrolledEventRequest, ValidateEnrolledEventResponse>> {
+    enrollmentToken?: Uint8Array
+  ): Promise<
+    grpc.ClientDuplexStream<
+      ValidateEnrolledEventRequest,
+      ValidateEnrolledEventResponse
+    >
+  > {
     const authenticationStream = this.getEventClient().validateEnrolledEvent();
 
     const request = new ValidateEnrolledEventRequest();
@@ -271,9 +333,11 @@ export class AudioService {
     audio.setEncoding(audioConfig.encoding);
     audio.setSampleratehertz(audioConfig.sampleratehertz);
     audio.setAudiochannelcount(audioConfig.audiochannelcount);
-    audio.setLanguagecode(audioConfig.languagecode || Config.defaultLanguageCode);
+    audio.setLanguagecode(
+      audioConfig.languagecode || Config.defaultLanguageCode
+    );
 
-    config.setAudio(audio)
+    config.setAudio(audio);
     request.setConfig(config);
 
     // Send config
@@ -299,12 +363,13 @@ export class AudioService {
     userId: string,
     enablePunctuationCapitalization: boolean,
     doSingleUtterance: boolean,
-    vadSensitivity: ThresholdSensitivity=ThresholdSensitivity.LOW,
-    vadDuration: number=0,
-    customVocabThreshold: ThresholdSensitivity=ThresholdSensitivity.MEDIUM,
-    customVocabID:string = "",
-    customVocabWords:Array<string>=[],
-    audioConfig: AudioConfig.AsObject): Promise<grpc.ClientDuplexStream<TranscribeRequest, TranscribeResponse>> {
+    vadSensitivity: ThresholdSensitivity = ThresholdSensitivity.LOW,
+    vadDuration = 0,
+    customVocabThreshold: ThresholdSensitivity = ThresholdSensitivity.MEDIUM,
+    customVocabID = '',
+    customVocabWords: Array<string> = [],
+    audioConfig: AudioConfig.AsObject
+  ): Promise<grpc.ClientDuplexStream<TranscribeRequest, TranscribeResponse>> {
     const transcriptionStream = this.getTranscribeClient().transcribe();
 
     const request = new TranscribeRequest();
@@ -320,25 +385,27 @@ export class AudioService {
     audio.setEncoding(audioConfig.encoding);
     audio.setSampleratehertz(audioConfig.sampleratehertz);
     audio.setAudiochannelcount(audioConfig.audiochannelcount);
-    audio.setLanguagecode(audioConfig.languagecode || Config.defaultLanguageCode);
+    audio.setLanguagecode(
+      audioConfig.languagecode || Config.defaultLanguageCode
+    );
 
     //Note that if the user specifies both a custom vocab ID and a list of custom words
     //They will be merged server side into a single custom vocab lexical tree.
-    if (customVocabID != "") {
+    if (customVocabID != '') {
       //If the user specified a specific custom vocab ID that is stored server side
       //add it to the custom vocab field in the config packet
       config.setCustomvocabularyid(customVocabID);
     }
 
     if (customVocabWords.length > 0) {
-      var cvWords = new CustomVocabularyWords()
-      customVocabWords.forEach(element => {
+      const cvWords = new CustomVocabularyWords();
+      customVocabWords.forEach((element) => {
         cvWords.addWords(element);
       });
       config.setCustomwordlist(cvWords);
     }
 
-    config.setCustomvocabrewardthreshold(customVocabThreshold)
+    config.setCustomvocabrewardthreshold(customVocabThreshold);
 
     config.setAudio(audio);
     request.setConfig(config);
@@ -358,10 +425,14 @@ export class AudioService {
    * @returns Promise<grpc.ClientReadableStream<SynthesizeSpeechResponse>> - a stream of audio data with the synthesized voice.
    *          The first response will contain audio config information, all subsequent responses will contain audio data
    */
-  public async synthesizeSpeech(phrase: string, modelName: string, sampleRateHertz?: number): Promise<grpc.ClientReadableStream<SynthesizeSpeechResponse>> {
+  public async synthesizeSpeech(
+    phrase: string,
+    modelName: string,
+    sampleRateHertz?: number
+  ): Promise<grpc.ClientReadableStream<SynthesizeSpeechResponse>> {
     const voiceConfig = new VoiceSynthesisConfig();
     voiceConfig.setModelname(modelName);
-    voiceConfig.setSampleratehertz(sampleRateHertz ?? 16000)
+    voiceConfig.setSampleratehertz(sampleRateHertz ?? 16000);
 
     const request = new SynthesizeSpeechRequest();
     request.setPhrase(phrase);
@@ -374,35 +445,50 @@ export class AudioService {
 
   private getModelsClient(): AudioModelsClient {
     if (this.modelsClient == undefined) {
-      this.modelsClient = new AudioModelsClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.modelsClient = new AudioModelsClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.modelsClient;
   }
 
   private getBioClient(): AudioBiometricsClient {
     if (this.biometricsClient == undefined) {
-      this.biometricsClient = new AudioBiometricsClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.biometricsClient = new AudioBiometricsClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.biometricsClient;
   }
 
   private getEventClient(): AudioEventsClient {
     if (this.eventClient == undefined) {
-      this.eventClient = new AudioEventsClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.eventClient = new AudioEventsClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.eventClient;
   }
 
   private getTranscribeClient(): AudioTranscriptionsClient {
     if (this.transcribeClient == undefined) {
-      this.transcribeClient = new AudioTranscriptionsClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.transcribeClient = new AudioTranscriptionsClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.transcribeClient;
   }
 
   private getSynthesisClient(): AudioSynthesisClient {
     if (this.synthesisClient == undefined) {
-      this.synthesisClient = new AudioSynthesisClient(Config.getHost(), this.tokenManager.getCallCredentials());
+      this.synthesisClient = new AudioSynthesisClient(
+        Config.getHost(),
+        this.tokenManager.getCallCredentials()
+      );
     }
     return this.synthesisClient;
   }
@@ -418,14 +504,14 @@ export class FullTranscriptAggregator {
   public processResponse(response?: TranscribeWordResponse) {
     // If nothing is returned, do nothing
     if (!response || !response.getWordsList().length) {
-      return
+      return;
     }
 
     // Get the expected transcript size from the index of the last word.
     const responseSize = response.getLastwordindex() + 1;
 
     // Loop through returned words and set the returned value at the specified index in currentWordList
-    for (let word of response.getWordsList()) {
+    for (const word of response.getWordsList()) {
       this.currentWordList[word.getWordindex()] = word.toObject();
     }
 
@@ -442,7 +528,7 @@ export class FullTranscriptAggregator {
   }
 
   // Returns the full transcript as computed from the current word list
-  public getCurrentTranscript(delimiter=' '): string {
+  public getCurrentTranscript(delimiter = ' '): string {
     if (!this.currentWordList.length) {
       return '';
     }

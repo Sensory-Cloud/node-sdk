@@ -1,7 +1,7 @@
-import { Config } from "../config";
-import { IOauthService } from "../services/oauth.service";
+import { Config } from '../config';
+import { IOauthService } from '../services/oauth.service';
 
-import * as grpc from "@grpc/grpc-js";
+import * as grpc from '@grpc/grpc-js';
 
 /** Manages the rotation and injection of OAuth JWTs into requests */
 export interface ITokenManager {
@@ -9,13 +9,13 @@ export interface ITokenManager {
    * Get a token.
    * @returns Promise<string> - the token
    */
-  getToken(): Promise<string>
+  getToken(): Promise<string>;
 
   /**
    * Get Grpc client credentials
    * @returns grpc.ChannelCredentials
    */
-  getCallCredentials(): grpc.ChannelCredentials
+  getCallCredentials(): grpc.ChannelCredentials;
 }
 
 /** Manages the rotation and injection of OAuth JWTs into grpc requests */
@@ -25,7 +25,10 @@ export class TokenManager implements ITokenManager {
   private token?: string;
   private expires?: Date;
 
-  constructor(private readonly oauthService: IOauthService) {}
+  constructor(private readonly oauthService: IOauthService) {
+    // , private readonly envPath: string
+    // const iniFile = fs.readFileSync(envPath,'utf8');
+  }
 
   /**
    * Gets a cached local token if the token exists and is not expired. Otherwise, requests a new token from Sensory Cloud.
@@ -49,29 +52,39 @@ export class TokenManager implements ITokenManager {
     const meta = new grpc.Metadata();
     const token = await this.getToken();
 
-    meta.set("Authorization", `Bearer ${token}`);
+    meta.set('Authorization', `Bearer ${token}`);
     return meta;
   }
 
   public getCallCredentials(): grpc.ChannelCredentials {
-    const callCredentials = grpc.credentials.createFromMetadataGenerator(async (options, cb) => {
-      try {
-        const metadata = await this.getAuthorizationMetadata();
-        cb(null, metadata);
-      } catch (err) {
-        cb(err);
+    const callCredentials = grpc.credentials.createFromMetadataGenerator(
+      async (_, cb) => {
+        try {
+          const metadata = await this.getAuthorizationMetadata();
+          cb(null, metadata);
+        } catch (err) {
+          cb(err);
+        }
       }
-    });
+    );
 
     if (Config.getSharedConfig().isSecure) {
-      return grpc.credentials.combineChannelCredentials(grpc.credentials.createSsl(), callCredentials);
+      return grpc.credentials.combineChannelCredentials(
+        grpc.credentials.createSsl(),
+        callCredentials
+      );
     } else {
-      return grpc.credentials.combineChannelCredentials(grpc.credentials.createInsecure(), callCredentials);
+      return grpc.credentials.combineChannelCredentials(
+        grpc.credentials.createInsecure(),
+        callCredentials
+      );
     }
   }
 
   private setToken(token: string, expires: Date) {
     this.token = token;
-    this.expires = new Date(expires.getTime() - this.expiresBufferSeconds * 1000)
+    this.expires = new Date(
+      expires.getTime() - this.expiresBufferSeconds * 1000
+    );
   }
 }
