@@ -1,4 +1,4 @@
-import { Config, EnrollmentType, SDKInitConfig } from './config';
+import { Config, EnrollmentType } from './config';
 import { DeviceResponse } from './generated/v1/management/device_pb';
 import { IOauthService } from './services/oauth.service';
 
@@ -31,12 +31,12 @@ export class Initializer {
    * @returns the response from the device enrollment call. If the device has been previously enrolled, the return will be an empty object
    */
   public static async initializeFromConfig(
-    config: SDKInitConfig,
+    envFilePath: string,
     oauthService: IOauthService,
     jwtSigner?: IJWTSigner
   ): Promise<DeviceResponse.AsObject> {
     // Save config in memory
-    Config.sharedConfig = config;
+    const config = Config.initialize(envFilePath);
 
     const credentialStore = oauthService.getCredentialStore();
 

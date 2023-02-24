@@ -1,4 +1,4 @@
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 
 /** Handles cryptographic operations */
 export class CryptoService {
@@ -11,7 +11,7 @@ export class CryptoService {
    * @returns string
    */
   public static getSecureRandomString(length = 26): string {
-    return Array.from(crypto.getRandomValues(new Uint32Array(length)))
+    return Array.from(crypto.randomBytes(length))
       .map((x) => this.base64chars[x % this.base64chars.length])
       .join('');
   }

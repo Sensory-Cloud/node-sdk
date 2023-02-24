@@ -1,9 +1,55 @@
-// TODO: Read config from .ini file (this isn't web!)
+import * as fs from 'fs';
 
 /** Configuration class to hold SDK configurations */
 export class Config {
   /** Shared configuration object. This should not be directly set. Instead `Initializer.initialize` should be called */
-  static sharedConfig: SDKInitConfig;
+  private static sharedConfig: SDKInitConfig;
+
+  // initialize with a .env file
+  public static initialize(envFilePath: string): SDKInitConfig {
+    const iniFile = fs.readFileSync(envFilePath, 'utf8');
+
+    // Create new config
+    const config = {} as SDKInitConfig;
+
+    // Parse config
+    const configLines = iniFile.split('\n').filter((l) => l.includes('='));
+    for (const line of configLines) {
+      const keyValue = line.split('=');
+      switch (keyValue[0]) {
+        case 'fullyQualifiedDomainName':
+          config.fullyQualifiedDomainName = keyValue[1];
+          break;
+        case 'tenantID':
+          config.tenantId = keyValue[1];
+          break;
+        case 'credential':
+          config.credential = keyValue[1];
+          break;
+        case 'enrollmentType':
+          config.enrollmentType = EnrollmentType[keyValue[1]];
+          break;
+        case 'deviceID':
+          config.deviceId = keyValue[1];
+          break;
+        case 'deviceName':
+          config.deviceName = keyValue[1];
+          break;
+        case 'isSecure':
+          config.isSecure = keyValue[1] === 'true';
+          break;
+      }
+    }
+
+    this.sharedConfig = config;
+    return this.sharedConfig;
+  }
+
+  // initializeWithConfig allows you to initialize directly with a configuration object.
+  public static initializeWithConfig(config: SDKInitConfig): SDKInitConfig {
+    this.sharedConfig = config;
+    return this.sharedConfig;
+  }
 
   /** Default language code used for audio calls */
   public static defaultLanguageCode = 'en_US';
@@ -12,6 +58,10 @@ export class Config {
    * @returns the shared configuration object
    */
   public static getSharedConfig(): SDKInitConfig {
+    if (!this.sharedConfig) {
+      throw new Error('shared config was not set. Did you forget to call initialize()?');
+    }
+
     return this.sharedConfig;
   }
 

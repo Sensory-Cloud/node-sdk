@@ -25,10 +25,7 @@ export class TokenManager implements ITokenManager {
   private token?: string;
   private expires?: Date;
 
-  constructor(private readonly oauthService: IOauthService) {
-    // , private readonly envPath: string
-    // const iniFile = fs.readFileSync(envPath,'utf8');
-  }
+  constructor(private readonly oauthService: IOauthService) {}
 
   /**
    * Gets a cached local token if the token exists and is not expired. Otherwise, requests a new token from Sensory Cloud.

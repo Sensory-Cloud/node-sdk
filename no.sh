@@ -111,6 +111,10 @@ case "$1" in
     build
   ;;
 
+  "test"|"t")
+    npx nyc --silent ava
+  ;;
+
   "publish"|"p")
     build
 

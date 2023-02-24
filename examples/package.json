@@ -1,0 +1,14 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "Examples of how to use Sensory Cloud's Node SDK",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Bryan McGrane",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "sensory-cloud": "file:.."
+  }
+}
