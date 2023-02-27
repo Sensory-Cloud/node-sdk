@@ -1,14 +1,23 @@
-import { AudioService, Initializer, ISecureCredentialStore, ManagementService, OauthService, TokenManager } from 'sensory-cloud';
-import * as fs from 'fs';
+import { AudioService, Initializer, HealthService, OauthService, TokenManager } from '@sensory-cloud/node-sdk';
+import * as http from 'http';
+import { InsecureCredentialStore } from '../credential/credential';
 
-async function main() {
+async function audioExample() {
   // Create a credential store
   const credentialStore = new InsecureCredentialStore();
+  const healthService = new HealthService();
   const oauthService = new OauthService(credentialStore);
-  const envFilePath = `${__dirname}/example-credentials.ini`
+  const envFilePath = `${__dirname}/../example-credentials.ini`
 
   // Register our SDK with SensoryCloud.
   await Initializer.initializeFromConfig(envFilePath, oauthService)
+
+  const health = await healthService.getHealth();
+  console.log(health)
+
+  // Get Info about me
+  const device = await oauthService.getWhoAmI();
+  console.log(device)
 
   // Create tokenManager now that we're registered. This handles fetching and refreshing Oauth tokens behind the scenes.
   const tokenManger = new TokenManager(oauthService);
@@ -22,33 +31,18 @@ async function main() {
 }
 
 if (require.main === module) {
-  await main();
-}
+  // Example server
+  const server = http.createServer((req, res) => {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Hello World');
+  });
 
-// This implementation is not secure. It is up to you to store your credentials in
-// a secure storage such as an encrypted database or HSM.
-export class InsecureCredentialStore implements ISecureCredentialStore {
-  private readonly credentialPath = './insecure-credentials.txt'
+  // Run audio example
+  audioExample().catch((err) => console.error(err));
 
-  saveCredentials(clientId: string, clientSecret: string): void {
-    fs.writeFileSync(this.credentialPath, `${clientId}:${clientSecret}`);
-  }
-
-  async getClientId(): Promise<string> {
-    const credentials = fs.readFileSync(this.credentialPath, 'utf8');
-    if (!credentials.length) {
-      throw new Error('clientId could not be obtained: credentials are not stored')
-    }
-
-    return credentials.split(':')[0];
-  }
-
-  async getClientSecret(): Promise<string> {
-    const credentials = fs.readFileSync(this.credentialPath, 'utf8');
-    if (!credentials.length) {
-      throw new Error('clientId could not be obtained: credentials are not stored')
-    }
-
-    return credentials.split(':')[1];
-  }
+  // Listen on the desired port
+  server.listen(3000, '127.0.0.1', () => {
+    console.log(`Server running at http://'127.0.0.1':3000/`);
+  });
 }

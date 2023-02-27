@@ -69,11 +69,7 @@ export class Config {
    * @returns The host for the configured Sensory Cloud server in the form "https://sensorycloud.ai"
    */
   public static getHost(): string {
-    let protocol = 'https://';
-    if (!this.sharedConfig.isSecure) {
-      protocol = 'http://';
-    }
-    return protocol + this.sharedConfig.fullyQualifiedDomainName;
+    return this.sharedConfig.fullyQualifiedDomainName;
   }
 }
 

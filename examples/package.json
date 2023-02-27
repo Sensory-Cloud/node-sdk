@@ -4,11 +4,11 @@
   "description": "Examples of how to use Sensory Cloud's Node SDK",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "audio": "npx ts-node audio/audio.ts"
   },
   "author": "Bryan McGrane",
   "license": "Apache-2.0",
   "dependencies": {
-    "sensory-cloud": "file:.."
+    "@sensory-cloud/node-sdk": "file:.."
   }
 }

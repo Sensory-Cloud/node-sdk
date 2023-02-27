@@ -255,7 +255,7 @@ export class OauthService implements IOauthService {
     if (this.deviceClient == undefined) {
       this.deviceClient = new DeviceServiceClient(
         Config.getHost(),
-        this.getCallCredentials()
+        grpc.credentials.createSsl()
       );
     }
     return this.deviceClient;
