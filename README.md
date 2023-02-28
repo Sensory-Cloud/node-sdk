@@ -19,4 +19,4 @@ Most of the time this information is packaged in a credentials.ini file provided
 
 ## Examples
 
-All examples cane be found in the `/examples` directory.
+All examples can be found in the `/examples` directory.
