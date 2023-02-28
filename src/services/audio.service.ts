@@ -287,24 +287,27 @@ export class AudioService {
    *
    * @param  {string} modelName - the exact name of the model you intend to use for transcription. This model name can be retrieved from the getModels() call.
    * @param  {string} userId - the unique userId for the user requesting this event
+   * @param  {AudioConfig.AsObject} audioConfig - the specifics of the audio data
    * @param  {boolean} enablePunctuationCapitalization - if true, the resulting transcript will include punctuation and capitalization.
    * @param  {boolean} doSingleUtterance - if true, the server will automatically close the stream once the user stops talking.
    * @param  {ThresholdSensitivity=ThresholdSensitivity.LOW} vadSensitivity - the sensitivity of the voice activity detector. Defaults to LOW.
    * @param  {number} vadDuration - the duration of silence to detect before automatically closing the stream as a number of seconds. Defaults to 1 second.
-   * @param  {AudioConfig.AsObject} audioConfig - the specifics of the audio data
+   * @param  {ThresholdSensitivity=ThresholdSensitivity.MEDIUM} customVocabThreshold - How much we should prioritize custom vocab when running audio through the language model
+   * @param  {string} customVocabID - The ID of the custom vocab if you've stored it in the backend
+   * @param  {Array<string>=[]} customVocabWords - Your own custom vocab to include with this request
    * @returns Promise<grpc.ClientDuplexStream<TranscribeResponse, TranscribeResponse>> - a bidirectional stream where TranscribeRequests can be passed to the cloud and TranscribeResponses are passed back
    */
   public async streamTranscription(
     modelName: string,
     userId: string,
+    audioConfig: AudioConfig.AsObject,
     enablePunctuationCapitalization: boolean,
     doSingleUtterance: boolean,
     vadSensitivity: ThresholdSensitivity=ThresholdSensitivity.LOW,
     vadDuration =0,
     customVocabThreshold: ThresholdSensitivity=ThresholdSensitivity.MEDIUM,
     customVocabID = "",
-    customVocabWords:Array<string>=[],
-    audioConfig: AudioConfig.AsObject): Promise<grpc.ClientDuplexStream<TranscribeRequest, TranscribeResponse>> {
+    customVocabWords:Array<string>=[]): Promise<grpc.ClientDuplexStream<TranscribeRequest, TranscribeResponse>> {
     const transcriptionStream = this.getTranscribeClient().transcribe();
 
     const request = new TranscribeRequest();

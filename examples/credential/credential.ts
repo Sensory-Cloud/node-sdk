@@ -5,7 +5,7 @@ import { ISecureCredentialStore } from '@sensory-cloud/node-sdk';
 // This implementation is not secure. It is up to you to store your credentials in
 // a secure storage such as an encrypted database or HSM.
 export class InsecureCredentialStore implements ISecureCredentialStore {
-  private readonly credentialPath = './insecure-credentials.txt'
+  private readonly credentialPath = './insecure-credentials.ini'
 
   saveCredentials(clientId: string, clientSecret: string): void {
     fs.writeFileSync(this.credentialPath, `${clientId}:${clientSecret}`);

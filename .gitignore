@@ -47,7 +47,7 @@ testem.log
 Thumbs.db
 
 # Credential files
-credentials.ini
+*.ini
 
 # Build files
 /Build

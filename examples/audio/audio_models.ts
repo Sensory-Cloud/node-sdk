@@ -7,7 +7,7 @@ async function audioExample() {
   const credentialStore = new InsecureCredentialStore();
   const healthService = new HealthService();
   const oauthService = new OauthService(credentialStore);
-  const envFilePath = `${__dirname}/../example-credentials.ini`
+  const envFilePath = `${__dirname}/../credentials.ini`
 
   // Register our SDK with SensoryCloud.
   await Initializer.initializeFromConfig(envFilePath, oauthService)
