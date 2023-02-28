@@ -15,7 +15,7 @@ Most of the time this information is packaged in a credentials.ini file provided
 
 ## Installation
 
-`npm install @sensory-cloud/node-sdk`
+`npm install @sensory-cloud/node-sdk --save`
 
 ## Examples
 
