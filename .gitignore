@@ -49,6 +49,9 @@ Thumbs.db
 # Credential files
 *.ini
 
+# Test files
+*.wav
+
 # Build files
 /Build
 
