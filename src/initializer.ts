@@ -46,8 +46,8 @@ export class Initializer {
     try {
       clientId = await credentialStore.getClientId();
       clientSecret = await credentialStore.getClientSecret();
-    } catch(err) {
-      console.error(err)
+    } catch (err) {
+      console.error(err);
     }
 
     if (clientId != '' && clientSecret != '') {

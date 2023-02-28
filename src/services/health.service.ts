@@ -8,7 +8,7 @@ import * as grpc from '@grpc/grpc-js';
 /** Service to handle all server health functions */
 export class HealthService {
   constructor(
-    private healthClient: HealthServiceClient | undefined = undefined,
+    private healthClient: HealthServiceClient | undefined = undefined
   ) {}
 
   /**
@@ -27,7 +27,6 @@ export class HealthService {
   }
 
   private getHealthClient(): HealthServiceClient {
-
     if (this.healthClient == undefined) {
       this.healthClient = new HealthServiceClient(
         Config.getHost(),

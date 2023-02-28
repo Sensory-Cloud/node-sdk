@@ -1,6 +1,5 @@
 import test from 'ava';
 
-
 import * as mock from 'ts-mockito';
 import { Config } from '../config';
 import { OauthServiceClient } from '../generated/oauth/oauth_grpc_pb';
@@ -56,16 +55,17 @@ export class mockOauthService implements IOauthService {
   }
 }
 
-
 test('OauthService should be created', (t) => {
   const oauthServiceClient = mock.mock(OauthServiceClient);
   const deviceServiceClient = mock.mock(DeviceServiceClient);
-  const config = Config.initialize(`${__dirname}/../../../examples/example-credentials.ini`);
+  const config = Config.initialize(
+    `${__dirname}/../../../examples/example-credentials.ini`
+  );
 
   const oauthService = new OauthService(
     new mockCredentialStore(),
     oauthServiceClient,
-    deviceServiceClient,
+    deviceServiceClient
   );
   t.assert(oauthService, 'an oauth service should be created');
 });
@@ -73,47 +73,53 @@ test('OauthService should be created', (t) => {
 test('OauthService.credentials should work correctly', (t) => {
   const oauthServiceClient = mock.mock(OauthServiceClient);
   const deviceServiceClient = mock.mock(DeviceServiceClient);
-  const config = Config.initialize(`${__dirname}/../../../examples/example-credentials.ini`);
+  const config = Config.initialize(
+    `${__dirname}/../../../examples/example-credentials.ini`
+  );
 
   const oauthService = new OauthService(
     new mockCredentialStore(),
     oauthServiceClient,
-    deviceServiceClient,
+    deviceServiceClient
   );
   t.assert(oauthService, 'an oauth service should be created');
 
-  const credentials = oauthService.generateCredentials()
+  const credentials = oauthService.generateCredentials();
   t.assert(credentials, 'credentials should be created');
 });
 
 test('OauthService.getCallCredentials should work correctly', (t) => {
   const oauthServiceClient = mock.mock(OauthServiceClient);
   const deviceServiceClient = mock.mock(DeviceServiceClient);
-  const config = Config.initialize(`${__dirname}/../../../examples/example-credentials.ini`);
+  const config = Config.initialize(
+    `${__dirname}/../../../examples/example-credentials.ini`
+  );
 
   const oauthService = new OauthService(
     new mockCredentialStore(),
     oauthServiceClient,
-    deviceServiceClient,
+    deviceServiceClient
   );
   t.assert(oauthService, 'an oauth service should be created');
 
-  const credentials = oauthService.getCallCredentials()
+  const credentials = oauthService.getCallCredentials();
   t.assert(credentials, 'credentials should be created');
 });
 
 test('OauthService.getCredentialStore should work correctly', (t) => {
   const oauthServiceClient = mock.mock(OauthServiceClient);
   const deviceServiceClient = mock.mock(DeviceServiceClient);
-  const config = Config.initialize(`${__dirname}/../../../examples/example-credentials.ini`);
+  const config = Config.initialize(
+    `${__dirname}/../../../examples/example-credentials.ini`
+  );
 
   const oauthService = new OauthService(
     new mockCredentialStore(),
     oauthServiceClient,
-    deviceServiceClient,
+    deviceServiceClient
   );
   t.assert(oauthService, 'an oauth service should be created');
 
-  const credentialStore = oauthService.getCredentialStore()
+  const credentialStore = oauthService.getCredentialStore();
   t.assert(credentialStore, 'credentialStore should be created');
 });

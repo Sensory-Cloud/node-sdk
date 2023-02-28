@@ -59,7 +59,9 @@ export class Config {
    */
   public static getSharedConfig(): SDKInitConfig {
     if (!this.sharedConfig) {
-      throw new Error('shared config was not set. Did you forget to call initialize()?');
+      throw new Error(
+        'shared config was not set. Did you forget to call initialize()?'
+      );
     }
 
     return this.sharedConfig;
