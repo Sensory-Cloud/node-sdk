@@ -26,7 +26,7 @@ async function audioExample() {
   const audioService = new AudioService(tokenManger);
 
   // Get all models from SensoryCloud. All endpoints will require you specify a unique model name.
-  const models = await audioService.getModels()
+  const models = await audioService.getModels();
   console.log(models)
 }
 
