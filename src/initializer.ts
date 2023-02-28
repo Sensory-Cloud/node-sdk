@@ -35,15 +35,22 @@ export class Initializer {
     oauthService: IOauthService,
     jwtSigner?: IJWTSigner
   ): Promise<DeviceResponse.AsObject> {
-    // Save config in memory
+    // Get config from memory
     const config = Config.initialize(envFilePath);
 
     const credentialStore = oauthService.getCredentialStore();
 
-    if (
-      (await credentialStore.getClientId()) != '' &&
-      (await credentialStore.getClientSecret()) != ''
-    ) {
+    let clientId = '';
+    let clientSecret = '';
+
+    try {
+      clientId = await credentialStore.getClientId();
+      clientSecret = await credentialStore.getClientSecret();
+    } catch(err) {
+      console.error(err)
+    }
+
+    if (clientId != '' && clientSecret != '') {
       // SDK has been previously enrolled
       return { name: '', deviceid: '' };
     }

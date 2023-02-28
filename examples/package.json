@@ -4,11 +4,13 @@
   "description": "Examples of how to use Sensory Cloud's Node SDK",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "audio-models": "npx ts-node audio/audio_models.ts",
+    "audio-biometrics": "npx ts-node audio/audio_biometrics.ts",
+    "audio-transcription": "npx ts-node audio/audio_transcription.ts"
   },
   "author": "Bryan McGrane",
   "license": "Apache-2.0",
   "dependencies": {
-    "sensory-cloud": "file:.."
+    "@sensory-cloud/node-sdk": "file:.."
   }
 }

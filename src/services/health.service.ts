@@ -2,13 +2,13 @@ import { Config } from '../config';
 import { ServerHealthResponse } from '../generated/common/common_pb';
 import { HealthRequest } from '../generated/health/health_pb';
 import { HealthServiceClient } from '../generated/health/health_grpc_pb';
-import { ITokenManager } from '../token-manager/token.manager';
+
+import * as grpc from '@grpc/grpc-js';
 
 /** Service to handle all server health functions */
 export class HealthService {
   constructor(
     private healthClient: HealthServiceClient | undefined = undefined,
-    private readonly tokenManager: ITokenManager
   ) {}
 
   /**
@@ -27,10 +27,11 @@ export class HealthService {
   }
 
   private getHealthClient(): HealthServiceClient {
+
     if (this.healthClient == undefined) {
       this.healthClient = new HealthServiceClient(
         Config.getHost(),
-        this.tokenManager.getCallCredentials()
+        grpc.credentials.createSsl()
       );
     }
     return this.healthClient;
