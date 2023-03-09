@@ -6,7 +6,12 @@
   "scripts": {
     "audio-models": "npx ts-node audio/audio_models.ts",
     "audio-biometrics": "npx ts-node audio/audio_biometrics.ts",
-    "audio-transcription": "npx ts-node audio/audio_transcription.ts"
+    "audio-synthesis": "npx ts-node audio/audio_synthesis.ts",
+    "audio-transcription": "npx ts-node audio/audio_transcription.ts",
+    "audio-transcription-multi": "npx ts-node audio/audio_transcription_multi.ts",
+
+    "video-models": "npx ts-node video/video_models.ts",
+    "video-biometrics": "npx ts-node video/video_biometrics.ts"
   },
   "author": "Bryan McGrane",
   "license": "Apache-2.0",

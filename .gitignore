@@ -51,6 +51,8 @@ Thumbs.db
 
 # Test files
 *.wav
+*.jpg
+*.hyp
 
 # Build files
 /Build
