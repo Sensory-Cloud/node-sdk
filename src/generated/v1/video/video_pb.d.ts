@@ -225,6 +225,14 @@ export class CreateEnrollmentResponse extends jspb.Message {
     clearEnrollmenttoken(): void;
     getEnrollmenttoken(): common_common_pb.EnrollmentToken | undefined;
     setEnrollmenttoken(value?: common_common_pb.EnrollmentToken): CreateEnrollmentResponse;
+    getDidfindface(): boolean;
+    setDidfindface(value: boolean): CreateEnrollmentResponse;
+    clearBoundingboxList(): void;
+    getBoundingboxList(): Array<number>;
+    setBoundingboxList(value: Array<number>): CreateEnrollmentResponse;
+    addBoundingbox(value: number, index?: number): number;
+    getProbabilityface(): number;
+    setProbabilityface(value: number): CreateEnrollmentResponse;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): CreateEnrollmentResponse.AsObject;
@@ -245,6 +253,9 @@ export namespace CreateEnrollmentResponse {
         modelversion: string,
         score: number,
         enrollmenttoken?: common_common_pb.EnrollmentToken.AsObject,
+        didfindface: boolean,
+        boundingboxList: Array<number>,
+        probabilityface: number,
     }
 }
 
@@ -264,6 +275,14 @@ export class AuthenticateResponse extends jspb.Message {
     setUserid(value: string): AuthenticateResponse;
     getEnrollmentid(): string;
     setEnrollmentid(value: string): AuthenticateResponse;
+    getDidfindface(): boolean;
+    setDidfindface(value: boolean): AuthenticateResponse;
+    clearBoundingboxList(): void;
+    getBoundingboxList(): Array<number>;
+    setBoundingboxList(value: Array<number>): AuthenticateResponse;
+    addBoundingbox(value: number, index?: number): number;
+    getProbabilityface(): number;
+    setProbabilityface(value: number): AuthenticateResponse;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AuthenticateResponse.AsObject;
@@ -283,6 +302,9 @@ export namespace AuthenticateResponse {
         token?: common_common_pb.TokenResponse.AsObject,
         userid: string,
         enrollmentid: string,
+        didfindface: boolean,
+        boundingboxList: Array<number>,
+        probabilityface: number,
     }
 }
 
@@ -291,6 +313,14 @@ export class LivenessRecognitionResponse extends jspb.Message {
     setIsalive(value: boolean): LivenessRecognitionResponse;
     getScore(): number;
     setScore(value: number): LivenessRecognitionResponse;
+    getDidfindface(): boolean;
+    setDidfindface(value: boolean): LivenessRecognitionResponse;
+    clearBoundingboxList(): void;
+    getBoundingboxList(): Array<number>;
+    setBoundingboxList(value: Array<number>): LivenessRecognitionResponse;
+    addBoundingbox(value: number, index?: number): number;
+    getProbabilityface(): number;
+    setProbabilityface(value: number): LivenessRecognitionResponse;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): LivenessRecognitionResponse.AsObject;
@@ -306,6 +336,9 @@ export namespace LivenessRecognitionResponse {
     export type AsObject = {
         isalive: boolean,
         score: number,
+        didfindface: boolean,
+        boundingboxList: Array<number>,
+        probabilityface: number,
     }
 }
 

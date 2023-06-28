@@ -499,6 +499,32 @@ export namespace AuthenticateResponse {
     }
 }
 
+export class SoundIdTopNResponse extends jspb.Message { 
+    getResultid(): string;
+    setResultid(value: string): SoundIdTopNResponse;
+    getLogitscore(): number;
+    setLogitscore(value: number): SoundIdTopNResponse;
+    getProbabilityscore(): number;
+    setProbabilityscore(value: number): SoundIdTopNResponse;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): SoundIdTopNResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: SoundIdTopNResponse): SoundIdTopNResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: SoundIdTopNResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): SoundIdTopNResponse;
+    static deserializeBinaryFromReader(message: SoundIdTopNResponse, reader: jspb.BinaryReader): SoundIdTopNResponse;
+}
+
+export namespace SoundIdTopNResponse {
+    export type AsObject = {
+        resultid: string,
+        logitscore: number,
+        probabilityscore: number,
+    }
+}
+
 export class ValidateEventResponse extends jspb.Message { 
     getAudioenergy(): number;
     setAudioenergy(value: number): ValidateEventResponse;
@@ -508,6 +534,14 @@ export class ValidateEventResponse extends jspb.Message {
     setResultid(value: string): ValidateEventResponse;
     getScore(): number;
     setScore(value: number): ValidateEventResponse;
+    clearTopnresponseList(): void;
+    getTopnresponseList(): Array<SoundIdTopNResponse>;
+    setTopnresponseList(value: Array<SoundIdTopNResponse>): ValidateEventResponse;
+    addTopnresponse(value?: SoundIdTopNResponse, index?: number): SoundIdTopNResponse;
+    getResultstarttime(): number;
+    setResultstarttime(value: number): ValidateEventResponse;
+    getResultendtime(): number;
+    setResultendtime(value: number): ValidateEventResponse;
 
     hasPostprocessingaction(): boolean;
     clearPostprocessingaction(): void;
@@ -530,6 +564,9 @@ export namespace ValidateEventResponse {
         success: boolean,
         resultid: string,
         score: number,
+        topnresponseList: Array<SoundIdTopNResponse.AsObject>,
+        resultstarttime: number,
+        resultendtime: number,
         postprocessingaction?: AudioResponsePostProcessingAction.AsObject,
     }
 }
@@ -848,6 +885,8 @@ export class ValidateEventConfig extends jspb.Message {
     setUserid(value: string): ValidateEventConfig;
     getSensitivity(): ThresholdSensitivity;
     setSensitivity(value: ThresholdSensitivity): ValidateEventConfig;
+    getTopn(): number;
+    setTopn(value: number): ValidateEventConfig;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): ValidateEventConfig.AsObject;
@@ -865,6 +904,7 @@ export namespace ValidateEventConfig {
         modelname: string,
         userid: string,
         sensitivity: ThresholdSensitivity,
+        topn: number,
     }
 }
 
@@ -998,6 +1038,29 @@ export namespace CustomVocabularyWords {
     }
 }
 
+export class TranscribeEventConfig extends jspb.Message { 
+    getModelname(): string;
+    setModelname(value: string): TranscribeEventConfig;
+    getSensitivity(): ThresholdSensitivity;
+    setSensitivity(value: ThresholdSensitivity): TranscribeEventConfig;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): TranscribeEventConfig.AsObject;
+    static toObject(includeInstance: boolean, msg: TranscribeEventConfig): TranscribeEventConfig.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: TranscribeEventConfig, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): TranscribeEventConfig;
+    static deserializeBinaryFromReader(message: TranscribeEventConfig, reader: jspb.BinaryReader): TranscribeEventConfig;
+}
+
+export namespace TranscribeEventConfig {
+    export type AsObject = {
+        modelname: string,
+        sensitivity: ThresholdSensitivity,
+    }
+}
+
 export class TranscribeConfig extends jspb.Message { 
 
     hasAudio(): boolean;
@@ -1025,6 +1088,13 @@ export class TranscribeConfig extends jspb.Message {
     clearCustomwordlist(): void;
     getCustomwordlist(): CustomVocabularyWords | undefined;
     setCustomwordlist(value?: CustomVocabularyWords): TranscribeConfig;
+    getDoofflinemode(): boolean;
+    setDoofflinemode(value: boolean): TranscribeConfig;
+
+    hasWakewordconfig(): boolean;
+    clearWakewordconfig(): void;
+    getWakewordconfig(): TranscribeEventConfig | undefined;
+    setWakewordconfig(value?: TranscribeEventConfig): TranscribeConfig;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): TranscribeConfig.AsObject;
@@ -1048,6 +1118,8 @@ export namespace TranscribeConfig {
         customvocabrewardthreshold: ThresholdSensitivity,
         customvocabularyid: string,
         customwordlist?: CustomVocabularyWords.AsObject,
+        doofflinemode: boolean,
+        wakewordconfig?: TranscribeEventConfig.AsObject,
     }
 }
 

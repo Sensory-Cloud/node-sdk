@@ -480,6 +480,8 @@ export enum ModelType {
     FACE_RECOGNITION = 202,
     OBJECT_RECOGNITION = 203,
     IMAGE_TRANSFORM = 204,
+    FACE_EMBEDDING = 205,
+    LLM_GPT_3_5 = 301,
 }
 
 export enum TechnologyType {
@@ -489,6 +491,7 @@ export enum TechnologyType {
     TNL = 3,
     STT = 4,
     TTS = 5,
+    SOUND_ID = 6,
 }
 
 export enum CompressionType {
@@ -512,6 +515,7 @@ export enum UsageEventType {
     ENROLLMENT = 2,
     SYNTHESIS = 3,
     TRANSCRIPTION = 4,
+    LLM = 5,
 }
 
 export enum ServerType {

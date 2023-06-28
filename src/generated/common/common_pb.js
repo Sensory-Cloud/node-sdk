@@ -3752,7 +3752,9 @@ proto.sensory.api.common.ModelType = {
   FACE_BIOMETRIC: 201,
   FACE_RECOGNITION: 202,
   OBJECT_RECOGNITION: 203,
-  IMAGE_TRANSFORM: 204
+  IMAGE_TRANSFORM: 204,
+  FACE_EMBEDDING: 205,
+  LLM_GPT_3_5: 301
 };
 
 /**
@@ -3764,7 +3766,8 @@ proto.sensory.api.common.TechnologyType = {
   TS: 2,
   TNL: 3,
   STT: 4,
-  TTS: 5
+  TTS: 5,
+  SOUND_ID: 6
 };
 
 /**
@@ -3796,7 +3799,8 @@ proto.sensory.api.common.UsageEventType = {
   RECOGNITION: 1,
   ENROLLMENT: 2,
   SYNTHESIS: 3,
-  TRANSCRIPTION: 4
+  TRANSCRIPTION: 4,
+  LLM: 5
 };
 
 /**

@@ -349,68 +349,16 @@ export class AudioService {
   /**
    * Stream audio to Sensory Cloud in order to transcribe spoken words
    *
-   * @param  {string} modelName - the exact name of the model you intend to use for transcription. This model name can be retrieved from the getModels() call.
-   * @param  {string} userId - the unique userId for the user requesting this event
-   * @param  {AudioConfig.AsObject} audioConfig - the specifics of the audio data
-   * @param  {boolean} enablePunctuationCapitalization - if true, the resulting transcript will include punctuation and capitalization.
-   * @param  {boolean} doSingleUtterance - if true, the server will automatically close the stream once the user stops talking.
-   * @param  {ThresholdSensitivity=ThresholdSensitivity.LOW} vadSensitivity - the sensitivity of the voice activity detector. Defaults to LOW.
-   * @param  {number} vadDuration - the duration of silence to detect before automatically closing the stream as a number of seconds. Defaults to 1 second.
-   * @param  {ThresholdSensitivity=ThresholdSensitivity.MEDIUM} customVocabThreshold - How much we should prioritize custom vocab when running audio through the language model
-   * @param  {string} customVocabID - The ID of the custom vocab if you've stored it in the backend
-   * @param  {Array<string>=[]} customVocabWords - Your own custom vocab to include with this request
+   * @param  {TranscribeConfig} config - the exact transcribe config.
    * @returns Promise<grpc.ClientDuplexStream<TranscribeResponse, TranscribeResponse>> - a bidirectional stream where TranscribeRequests can be passed to the cloud and TranscribeResponses are passed back
    */
   public async streamTranscription(
-    modelName: string,
-    userId: string,
-    audioConfig: AudioConfig.AsObject,
-    enablePunctuationCapitalization: boolean,
-    doSingleUtterance: boolean,
-    vadSensitivity: ThresholdSensitivity = ThresholdSensitivity.LOW,
-    vadDuration = 0,
-    customVocabThreshold: ThresholdSensitivity = ThresholdSensitivity.MEDIUM,
-    customVocabID = '',
-    customVocabWords: Array<string> = []
+    config: TranscribeConfig,
+
   ): Promise<grpc.ClientDuplexStream<TranscribeRequest, TranscribeResponse>> {
     const transcriptionStream = this.getTranscribeClient().transcribe();
 
     const request = new TranscribeRequest();
-    const config = new TranscribeConfig();
-    const audio = new AudioConfig();
-
-    config.setModelname(modelName);
-    config.setUserid(userId);
-    config.setEnablepunctuationcapitalization(enablePunctuationCapitalization);
-    config.setDosingleutterance(doSingleUtterance);
-    config.setVadsensitivity(vadSensitivity);
-    config.setVadduration(vadDuration);
-    audio.setEncoding(audioConfig.encoding);
-    audio.setSampleratehertz(audioConfig.sampleratehertz);
-    audio.setAudiochannelcount(audioConfig.audiochannelcount);
-    audio.setLanguagecode(
-      audioConfig.languagecode || Config.defaultLanguageCode
-    );
-
-    //Note that if the user specifies both a custom vocab ID and a list of custom words
-    //They will be merged server side into a single custom vocab lexical tree.
-    if (customVocabID != '') {
-      //If the user specified a specific custom vocab ID that is stored server side
-      //add it to the custom vocab field in the config packet
-      config.setCustomvocabularyid(customVocabID);
-    }
-
-    if (customVocabWords.length > 0) {
-      const cvWords = new CustomVocabularyWords();
-      customVocabWords.forEach((element) => {
-        cvWords.addWords(element);
-      });
-      config.setCustomwordlist(cvWords);
-    }
-
-    config.setCustomvocabrewardthreshold(customVocabThreshold);
-
-    config.setAudio(audio);
     request.setConfig(config);
 
     // Stop Microphone on stream end

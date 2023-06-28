@@ -435,7 +435,8 @@ proto.sensory.api.v1.event.UsageEvent.toObject = function(includeInstance, msg) 
     audiodurationms: jspb.Message.getFieldWithDefault(msg, 9, 0),
     videoframecount: jspb.Message.getFieldWithDefault(msg, 10, 0),
     tenantid: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    billablefunction: jspb.Message.getFieldWithDefault(msg, 12, 0)
+    billablefunction: jspb.Message.getFieldWithDefault(msg, 12, 0),
+    tokencount: jspb.Message.getFieldWithDefault(msg, 13, 0)
   };
 
   if (includeInstance) {
@@ -522,6 +523,10 @@ proto.sensory.api.v1.event.UsageEvent.deserializeBinaryFromReader = function(msg
     case 12:
       var value = /** @type {!proto.sensory.api.common.ModelType} */ (reader.readEnum());
       msg.setBillablefunction(value);
+      break;
+    case 13:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setTokencount(value);
       break;
     default:
       reader.skipField();
@@ -634,6 +639,13 @@ proto.sensory.api.v1.event.UsageEvent.serializeBinaryToWriter = function(message
   if (f !== 0.0) {
     writer.writeEnum(
       12,
+      f
+    );
+  }
+  f = message.getTokencount();
+  if (f !== 0) {
+    writer.writeInt64(
+      13,
       f
     );
   }
@@ -910,6 +922,24 @@ proto.sensory.api.v1.event.UsageEvent.prototype.getBillablefunction = function()
  */
 proto.sensory.api.v1.event.UsageEvent.prototype.setBillablefunction = function(value) {
   return jspb.Message.setProto3EnumField(this, 12, value);
+};
+
+
+/**
+ * optional int64 tokenCount = 13;
+ * @return {number}
+ */
+proto.sensory.api.v1.event.UsageEvent.prototype.getTokencount = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 13, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.sensory.api.v1.event.UsageEvent} returns this
+ */
+proto.sensory.api.v1.event.UsageEvent.prototype.setTokencount = function(value) {
+  return jspb.Message.setProto3IntField(this, 13, value);
 };
 
 

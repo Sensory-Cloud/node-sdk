@@ -2,6 +2,7 @@ import { AudioService, Initializer, HealthService, OauthService, TokenManager, A
 import * as http from 'http';
 import * as fs from 'fs';
 import { InsecureCredentialStore } from '../credential/credential';
+import { AudioConfig, CustomVocabularyWords, ThresholdSensitivity, TranscribeConfig } from '../../build/main/generated/v1/audio/audio_pb';
 
 async function audioExample() {
   // Create a credential store
@@ -40,7 +41,6 @@ async function audioExample() {
 
   // Custom vocabulary is a powerful tool to add custom words like company names to the language model
   const customVocabThredhold = Audio.ThresholdSensitivity.MEDIUM;
-  const customVocabId = "";
 
   // The first word in the string is the word that should be spit out by our engine.
   // Possible pronunciations of that word follow the root word with comas
@@ -55,10 +55,33 @@ async function audioExample() {
     languagecode: 'en-us',
   }
 
+  const config = new TranscribeConfig();
+  const audio = new AudioConfig();
+
+  config.setModelname(modelName);
+  config.setUserid(userId);
+  config.setEnablepunctuationcapitalization(true);
+  config.setDosingleutterance(doKillOnVoiceActivityLost);
+  config.setVadsensitivity(vadSensitivity);
+  config.setVadduration(vadDurationSeconds);
+  config.setEnablepunctuationcapitalization(enablePunctuationAndCapitalization);
+  audio.setEncoding(audioConfig.encoding);
+  audio.setSampleratehertz(audioConfig.sampleratehertz);
+  audio.setAudiochannelcount(audioConfig.audiochannelcount);
+
+  if (customVocabWords.length > 0) {
+    const cvWords = new CustomVocabularyWords();
+    customVocabWords.forEach((element) => {
+      cvWords.addWords(element);
+    });
+    config.setCustomwordlist(cvWords);
+  }
+
+  config.setCustomvocabrewardthreshold(customVocabThredhold);
+  config.setAudio(audio);
+
   // Init the transcription bi-directional stream
-  const transcriptionStream = await audioService.streamTranscription(
-    modelName, userId, audioConfig, enablePunctuationAndCapitalization, doKillOnVoiceActivityLost,
-    vadSensitivity, vadDurationSeconds, customVocabThredhold, customVocabId, customVocabWords)
+  const transcriptionStream = await audioService.streamTranscription(config);
 
   // One way to load data is by reading a file. This could also be a data stream from a client.
   // We set highWaterMark to ensure the chunk size is below 600ms for improved performance

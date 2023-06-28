@@ -63,6 +63,8 @@ export class UsageEvent extends jspb.Message {
     setTenantid(value: string): UsageEvent;
     getBillablefunction(): common_common_pb.ModelType;
     setBillablefunction(value: common_common_pb.ModelType): UsageEvent;
+    getTokencount(): number;
+    setTokencount(value: number): UsageEvent;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): UsageEvent.AsObject;
@@ -88,6 +90,7 @@ export namespace UsageEvent {
         videoframecount: number,
         tenantid: string,
         billablefunction: common_common_pb.ModelType,
+        tokencount: number,
     }
 }
 
