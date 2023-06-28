@@ -1,4 +1,4 @@
-import { Initializer, ISecureCredentialStore, ManagementService, OauthService, TokenManager } from '@sensory-cloud/node-sdk';
+import { Initializer, ISecureCredentialStore, AssistantService, OauthService, TokenManager, Assistant } from '@sensory-cloud/node-sdk';
 import * as fs from 'fs';
 
 async function main() {
@@ -13,36 +13,41 @@ async function main() {
   // Create tokenManager now that we're registered. This handles fetching and refreshing Oauth tokens behind the scenes.
   const tokenManger = new TokenManager(oauthService);
 
-  // Create management service to make calls to SensoryCloud management endpoints
-  const managementService = new ManagementService(tokenManger);
+  // Create assistant service to make calls to SensoryCloud assistant endpoints
+  const assistantService = new AssistantService(tokenManger);
 
-  // Get all enrollments for a given UserId
-  const userId = 'something-given-to-users-when-they-enroll'
-  const userEnrollments = await managementService.getEnrollments(userId)
-  console.log(userEnrollments);
+  // Create chat request
+  const request = new Assistant.TextChatRequest();
+  const message = new Assistant.ChatMessage();
+  message.setRole(Assistant.ChatRole.USER);
+  message.setContent("tell me how large language models work.");
+  request.addMessages(message);
 
-  // Get a single enrollment from this user
-  const enrollment = userEnrollments.enrollmentsList[0];
+  // Get a chat response
+  const response = await assistantService.chat(request);
 
-  // Group together multiple enrollments for multi-user authentication.
-  // Enrollments can be across multiple users.
-  // Enrollment groups are pinned to a particular user, acting as the group owner.
-  const group = await managementService.createEnrollmentGroup(
-    userId, 'your-group-id', 'your-group-name', 'a good description', enrollment.modelname, [enrollment.id, '76317a48-17cc-4ea0-9fde-04b3f5177e3e']);
-  console.log(group);
+  if (!response.getMessage()) {
+    throw Error('No message returned!');
+  }
 
-  // Get all groups in the system
-  const groups = await managementService.getEnrollmentGroups(userId);
-  console.log(groups);
+  // Print response
+  console.log(response.toObject);
 
-  // Add an enrollment to this enrollment group
-  await managementService.appendEnrollmentGroup(group.id, ['even-more-enrollment-ids', '0a20dcc0-7e65-490c-86a9-5cacd0936d06'])
+  // Add response message to the buffer
+  request.addMessages(response.getMessage());
 
-  // Delete an enrollment
-  await managementService.deleteEnrollment(enrollment.id)
+  // Add new message
+  message.setContent("Nice! Tell me more!")
 
-  // Delete an enrollment group
-  await managementService.deleteEnrollmentGroup(group.id)
+  // Get a chat response
+  const response2 = await assistantService.chat(request);
+
+  if (!response2.getMessage()) {
+    throw Error('No message returned!');
+  }
+
+  // Print response
+  console.log(response2.toObject);
 }
 
 if (require.main === module) {

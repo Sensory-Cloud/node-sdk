@@ -65,6 +65,7 @@ build() {
   mkdir -p ./dist/generated
   cp -r ./src/generated ./dist
   npx tsc
+  cp -r ./dist/generated ./build/main
 }
 
 # --- Environment --------------------------------------------------
